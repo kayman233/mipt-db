@@ -1,0 +1,43 @@
+version: "3.8"
+
+networks:
+  postgres_network: 
+    driver: bridge
+
+# Use postgres/example user/password credentials
+version: '3.1'
+
+volumes:
+  db-data:
+    name: db-data
+
+services:
+  pgsdb:
+    image: postgres
+    restart: always
+    container_name: pgsdb
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PORT=5432
+    networks:
+      - postgres_network
+  
+  adminer:
+    image: adminer
+    container_name: adminer1
+    depends_on:
+      - pgsdb
+    environment:
+      - ADMINER_DEFAULT_DB_DRIVER=pgsdb
+      - ADMINER_DEFAULT_DB_HOST=postgres
+      - ADMINER_DEFAULT_DB_NAME=postgres
+    ports:
+      - 8081:8080
+    networks:
+      - postgres_network
